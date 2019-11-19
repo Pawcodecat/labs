@@ -1,6 +1,5 @@
 import Data.List
 import Data.Char
-
 --ex1--
 f1  :: Double -> Double
 f1  = \x -> x-2
@@ -125,3 +124,66 @@ sumWith2 g (x:xs) = g x + sumWith2 g xs -- (+) (g x) (sumWith g xs)
 prodWith2 g []     = 1
 prodWith2 g (x:xs) = g x * prodWith2 g xs -- (*) (g x) (prodWith g xs)
  
+sumWith' :: Num a => (a -> a) -> [a] -> a
+sumWith' = go 0
+ where
+   go acc g [] = acc
+   go acc g (x:xs) = go (g x + acc) g xs
+
+prodWith' :: Num a => (a -> a) -> [a] -> a
+prodWith' = go 1
+ where
+   go acc g [] = acc
+   go acc g (x:xs) = go (g x * acc) g xs
+
+--foldl3 :: (a -> x -> r) -> a -> [x] -> r0
+--foldl3 f a [] = a
+--foldl3 f a (x : xs) = foldl3 f (f a x) xs
+
+--sumWith'' g = foldl3 (\x acc -> g x + acc) 0 
+--prodWith'' g = foldl3 (\x acc -> g x * acc) 1
+
+--ex10--
+isSortedAsc2 :: Ord a => [a] -> Bool
+isSortedAsc2 xs = all id . map (\(x,y) -> x >= y) . zip xs $ tail xs
+
+second xs = map fst $ filter (odd . snd) $ zip xs [1..]
+
+
+--ex11--
+concat' :: [[a]] -> [a]
+concat' []     = []
+concat' (x:xs) = x ++ concat' xs
+
+
+--ex12--
+capitalize :: [Char] -> [Char]
+capitalize [] = []
+capitalize (x:xs) = toUpper x : (map toLower xs)
+
+formatStr s = foldr1 (\w s -> w ++ s) .
+          map capitalize .
+          filter (\x -> length x > 1) $ 
+          words s
+
+ prodPrices p = case p of
+   "A" -> 100
+    "B" -> 500
+    "C" -> 1000
+    _   -> error "Unknown product"
+           
+products = ["A","B","C"]
+           
+           -- basic discount strategy
+discStr1 p
+| price > 999 = 0.3 * price
+| otherwise   = 0.1 * price
+ where price = prodPrices p
+           
+           -- flat discount strategy
+discStr2 p = 0.2 * prodPrices p
+           
+totalDiscout discStr =
+foldl1 (+) .
+map discStr .
+filter (\p -> prodPrices p > 499)
