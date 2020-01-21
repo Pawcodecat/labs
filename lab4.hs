@@ -34,11 +34,11 @@ yCoord' (MkCart2DVec' _ y) = y
 
 data Cart2DVec'' a = MkCart2DVec'' {x::a, y::a}
 
---xCoord'' :: Cart2DVec'' a -> a
---xCoord'' (MkCart2DVec'' {x = xVal, y = _}) = xVal
+xCoord'' :: Cart2DVec'' a -> a
+xCoord'' (MkCart2DVec'' {x = xVal, y = _}) = xVal
 
---yCoord'' :: Cart2DVec'' a -> a
---yCoord'' (MkCart2DVec'' {y = yVal, x = _}) = yVal -- uwaga na kolejność x,y
+yCoord'' :: Cart2DVec'' a -> a
+yCoord'' (MkCart2DVec'' {y = yVal, x = _}) = yVal -- uwaga na kolejność x,y
 
 
 -- sum type example (two constructors)
@@ -67,10 +67,19 @@ uwaga: ta sama nazwa* dla:
 
  * druga (obok omówionej poprzednio -- z prefiksem 'Mk') powszechna konwencja w Haskellu!
 -}
---data Cart3DVec a = Cart3DVec a a a
+data Cart3DVec a = Cart3DVec a a a
 
---xCoord :: Cart3DVec -> Int
---xCoord (Cart3DVec x _ _) = x
+xCoord :: Cart3DVec -> Int
+xCoord (Cart3DVec x _ _) = x
+
+xCoord3D :: Cart3DVec a -> a
+xCoord3D (MkCart3DVec x _ _) = x
+
+yCoord3D :: Cart3DVec a -> a
+yCoord3D (MkCart3DVec _ y _) = y
+
+zCoord3D :: Cart3DVec a -> a
+zCoord3D (MkCart3DVec _ _ z) = z
 
 --ex3--
 data BinIntTree = EmptyIntBT |
@@ -99,6 +108,11 @@ show' :: Show a => Expr a -> String
 show' (Lit n) = show n
 show' (Add e1 e2) = "(" ++ show' e1 ++ "+" ++ show' e2 ++ ")"
 
+
+
+
+
+
 --ex5--
 data MyInt = MkMyInt Int
 instance Eq MyInt where
@@ -117,3 +131,49 @@ instance Num MyInt where
 
 instance Show MyInt where
     show (MkMyInt i) = "MkMyInt " ++ show i
+
+
+
+
+    --ex7--
+    module Stack (Stack(MkStack), empty, isEmpty, push, top, pop) where
+
+    empty :: Stack a
+    isEmpty :: Stack a -> Bool
+    push :: a -> Stack a -> Stack a
+    top :: Stack a -> a
+    pop :: Stack a -> (a,Stack a)
+    
+    newtype Stack a = MkStack [a] deriving Show
+    
+    empty = MkStack []
+    isEmpty (MkStack s) = null s
+    push x (MkStack s) = MkStack (x:s)
+    top (MkStack s) = head s
+    pop (MkStack (s:ss)) = (s,MkStack ss)
+
+    ex8--
+    module Stack
+    ( Stack
+    , empty   -- :: Stack a
+    , isEmpty -- :: Stack a -> Bool
+    , push    -- :: a -> Stack a -> Stack a
+    , top     -- :: Stack a -> a
+    , pop     -- :: Stack a -> (a,Stack a)
+    ) where
+  
+  -- interface (signature, contract)
+  empty :: Stack a
+  isEmpty :: Stack a -> Bool
+  push :: a -> Stack a -> Stack a
+  top :: Stack a -> a
+  pop :: Stack a -> (a,Stack a)
+  
+  -- implementation
+  newtype Stack a = MkStack [a] deriving Show -- hidden constructor (see the module export list)
+  
+  empty = MkStack []
+  isEmpty (MkStack s) = null s
+  push x (MkStack s) = MkStack (x:s)
+  top (MkStack s) = head s
+  pop (MkStack (s:ss)) = (s,MkStack ss)
